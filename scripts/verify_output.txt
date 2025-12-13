@@ -1,0 +1,19 @@
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+🚀 Starting Database Verification...
+
+--- 1. User Management ---
+Test user already exists: 2461dc1c-89cb-4431-9a03-4fe7ae18b086
+Profile validated. Current Balance: 1050
+
+--- 2. Trading System Verification ---
+Opening a BUY (Long) trade...
+✅ Trade Opened: a011bbe6-8694-421a-a188-b105cc8472e6
+Closing trade with PROFIT...
+✅ Trade Closed
+
+--- 3. Validation ---
+Trade PNL: $50 (Expected ~$50)
+User Balance: $1100
+Achievements Unlocked: 0
+
+Verification Complete. Tests Passed if no errors above.
