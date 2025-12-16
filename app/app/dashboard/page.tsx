@@ -1,409 +1,457 @@
-'use client';
+import Link from 'next/link';
 
-import { createClient } from '@/utils/supabase/client';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import './dashboard.css';
+// Mock data for the dashboard - will be replaced with real data from Supabase
+const statsData = [
+    {
+        title: 'Virtual Balance',
+        value: '$102,456',
+        icon: '💰',
+        iconBg: 'rgba(124, 58, 237, 0.1)',
+        iconColor: '#7c3aed',
+        change: '+2.45%',
+        positive: true,
+        period: 'vs last month',
+    },
+    {
+        title: 'Total P&L',
+        value: '+$2,456',
+        valueColor: '#10b981',
+        icon: '📈',
+        iconBg: 'rgba(16, 185, 129, 0.1)',
+        iconColor: '#10b981',
+        change: '+12.3%',
+        positive: true,
+        period: 'this week',
+    },
+    {
+        title: 'Win Rate',
+        value: '67.5%',
+        icon: '🎯',
+        iconBg: 'rgba(6, 182, 212, 0.1)',
+        iconColor: '#06b6d4',
+        change: '+5.2%',
+        positive: true,
+        period: 'improving',
+    },
+    {
+        title: 'Courses Completed',
+        value: '23/50',
+        icon: '🎓',
+        iconBg: 'rgba(245, 158, 11, 0.1)',
+        iconColor: '#f59e0b',
+        period: '3 in progress',
+    },
+];
 
-export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const supabase = createClient();
+const recentTrades = [
+    { symbol: 'EUR/USD', type: 'buy', time: '2 minutes ago', pnl: '+$234.50', positive: true, size: '0.5 lots' },
+    { symbol: 'GBP/JPY', type: 'sell', time: '15 minutes ago', pnl: '-$45.20', positive: false, size: '0.3 lots' },
+    { symbol: 'USD/CAD', type: 'buy', time: '1 hour ago', pnl: '+$128.00', positive: true, size: '0.2 lots' },
+    { symbol: 'AUD/USD', type: 'sell', time: '3 hours ago', pnl: '+$89.30', positive: true, size: '0.4 lots' },
+];
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/login');
-      } else {
-        setUser(user);
-        setLoading(false);
-      }
-    };
-    checkUser();
-  }, [router, supabase]);
+const quickActions = [
+    { icon: '📈', text: 'Start Trading', href: '/dashboard/trading' },
+    { icon: '🎓', text: 'Learn More', href: '/dashboard/courses' },
+    { icon: '🏆', text: 'Competitions', href: '/dashboard/leaderboard' },
+    { icon: '📊', text: 'Analytics', href: '/dashboard/analytics' },
+];
 
-  useEffect(() => {
-    // Simulate real-time updates
-    const interval = setInterval(() => {
-      const statValues = document.querySelectorAll('.stat-value');
-      if (statValues.length > 0) {
-        const randomStat = statValues[Math.floor(Math.random() * statValues.length)] as HTMLElement;
-        randomStat.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-          randomStat.style.transform = 'scale(1)';
-        }, 300);
-      }
-    }, 5000);
+const recentAchievements = [
+    { icon: '🏆', title: 'First Win!', description: 'Completed your first profitable trade', xp: '+50 XP' },
+    { icon: '🎯', title: '10 Trades', description: 'Executed 10 simulation trades', xp: '+100 XP' },
+];
 
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{
-        minHeight: '100vh',
+// Inline styles for dashboard page
+const styles = {
+    pageHeader: {
+        marginBottom: '2rem',
+    } as React.CSSProperties,
+    pageTitle: {
+        fontSize: '2rem',
+        fontWeight: 700,
+        color: '#1e1b4b',
+        marginBottom: '0.5rem',
+    } as React.CSSProperties,
+    pageSubtitle: {
+        color: '#64748b',
+    } as React.CSSProperties,
+    statsGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '2rem',
+    } as React.CSSProperties,
+    statCard: {
+        backgroundColor: 'white',
+        padding: '1.5rem',
+        borderRadius: '16px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        border: '1px solid #e2e8f0',
+        transition: 'all 0.2s',
+    } as React.CSSProperties,
+    statHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: '1rem',
+    } as React.CSSProperties,
+    statTitle: {
+        fontSize: '0.875rem',
+        color: '#64748b',
+        fontWeight: 500,
+        marginBottom: '0.5rem',
+    } as React.CSSProperties,
+    statValue: {
+        fontSize: '2rem',
+        fontWeight: 700,
+        color: '#1e1b4b',
+    } as React.CSSProperties,
+    statIcon: (bg: string): React.CSSProperties => ({
+        width: '48px',
+        height: '48px',
+        borderRadius: '12px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--gray-light)',
-        color: 'var(--primary)',
-        fontSize: '1.2rem',
-        fontWeight: 600
-      }}>
-        Loading...
-      </div>
+        fontSize: '1.5rem',
+        backgroundColor: bg,
+    }),
+    statFooter: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        fontSize: '0.875rem',
+    } as React.CSSProperties,
+    statChange: (positive: boolean): React.CSSProperties => ({
+        fontWeight: 600,
+        color: positive ? '#10b981' : '#ef4444',
+    }),
+    dashboardGrid: {
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr',
+        gap: '1.5rem',
+        marginBottom: '2rem',
+    } as React.CSSProperties,
+    card: {
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        padding: '1.5rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        border: '1px solid #e2e8f0',
+    } as React.CSSProperties,
+    cardHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+    } as React.CSSProperties,
+    cardTitle: {
+        fontSize: '1.125rem',
+        fontWeight: 700,
+        color: '#1e1b4b',
+    } as React.CSSProperties,
+    cardActions: {
+        display: 'flex',
+        gap: '0.5rem',
+    } as React.CSSProperties,
+    btnSm: (active: boolean): React.CSSProperties => ({
+        padding: '0.5rem 1rem',
+        border: '1px solid #e2e8f0',
+        backgroundColor: active ? '#7c3aed' : 'white',
+        color: active ? 'white' : '#1e1b4b',
+        borderRadius: '8px',
+        fontSize: '0.875rem',
+        cursor: 'pointer',
+        fontWeight: 500,
+    }),
+    chartContainer: {
+        height: '300px',
+        background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(6, 182, 212, 0.05))',
+        borderRadius: '12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    } as React.CSSProperties,
+    chartPlaceholder: {
+        textAlign: 'center' as const,
+        color: '#64748b',
+    } as React.CSSProperties,
+    quickActions: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '1rem',
+    } as React.CSSProperties,
+    actionBtn: {
+        padding: '1rem',
+        border: '2px solid #e2e8f0',
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        cursor: 'pointer',
+        textAlign: 'center' as const,
+        textDecoration: 'none',
+        display: 'block',
+        transition: 'all 0.2s',
+    } as React.CSSProperties,
+    actionIcon: {
+        fontSize: '2rem',
+        marginBottom: '0.5rem',
+    } as React.CSSProperties,
+    actionText: {
+        fontWeight: 600,
+        color: '#1e1b4b',
+        fontSize: '0.9rem',
+    } as React.CSSProperties,
+    achievementList: {
+        display: 'flex',
+        flexDirection: 'column' as const,
+        gap: '1rem',
+    } as React.CSSProperties,
+    achievementItem: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        padding: '1rem',
+        backgroundColor: '#f1f5f9',
+        borderRadius: '12px',
+    } as React.CSSProperties,
+    achievementIcon: {
+        width: '50px',
+        height: '50px',
+        borderRadius: '50%',
+        background: 'linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '1.5rem',
+    } as React.CSSProperties,
+    achievementInfo: {
+        flex: 1,
+    } as React.CSSProperties,
+    achievementTitle: {
+        fontWeight: 600,
+        color: '#1e1b4b',
+        marginBottom: '0.25rem',
+    } as React.CSSProperties,
+    achievementDesc: {
+        fontSize: '0.85rem',
+        color: '#64748b',
+    } as React.CSSProperties,
+    achievementXp: {
+        fontWeight: 700,
+        color: '#7c3aed',
+    } as React.CSSProperties,
+    tradeList: {
+        display: 'flex',
+        flexDirection: 'column' as const,
+        gap: '0.75rem',
+    } as React.CSSProperties,
+    tradeItem: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: '1rem',
+        backgroundColor: '#f1f5f9',
+        borderRadius: '12px',
+    } as React.CSSProperties,
+    tradeIcon: (type: string): React.CSSProperties => ({
+        width: '40px',
+        height: '40px',
+        borderRadius: '10px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 700,
+        marginRight: '1rem',
+        fontSize: '0.75rem',
+        backgroundColor: type === 'buy' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+        color: type === 'buy' ? '#10b981' : '#ef4444',
+    }),
+    tradeInfo: {
+        flex: 1,
+    } as React.CSSProperties,
+    tradeSymbol: {
+        fontWeight: 600,
+        color: '#1e1b4b',
+        marginBottom: '0.25rem',
+    } as React.CSSProperties,
+    tradeTime: {
+        fontSize: '0.8rem',
+        color: '#64748b',
+    } as React.CSSProperties,
+    tradeAmount: {
+        textAlign: 'right' as const,
+    } as React.CSSProperties,
+    tradePnl: (positive: boolean): React.CSSProperties => ({
+        fontWeight: 700,
+        fontSize: '1rem',
+        color: positive ? '#10b981' : '#ef4444',
+    }),
+    tradeSize: {
+        fontSize: '0.8rem',
+        color: '#64748b',
+    } as React.CSSProperties,
+    viewAllLink: {
+        color: '#7c3aed',
+        textDecoration: 'none',
+        fontWeight: 600,
+        fontSize: '0.9rem',
+    } as React.CSSProperties,
+    sectionTitle: {
+        fontSize: '0.9rem',
+        fontWeight: 600,
+        marginBottom: '1rem',
+        marginTop: '2rem',
+        color: '#1e1b4b',
+    } as React.CSSProperties,
+};
+
+export default function DashboardPage() {
+    return (
+        <>
+            {/* Page Header */}
+            <div style={styles.pageHeader}>
+                <h1 style={styles.pageTitle}>Welcome back! 👋</h1>
+                <p style={styles.pageSubtitle}>Here&apos;s what&apos;s happening with your trading journey today.</p>
+            </div>
+
+            {/* Stats Grid */}
+            <div style={styles.statsGrid}>
+                {statsData.map((stat, index) => (
+                    <div style={styles.statCard} key={index}>
+                        <div style={styles.statHeader}>
+                            <div>
+                                <h3 style={styles.statTitle}>{stat.title}</h3>
+                                <div style={{ ...styles.statValue, color: stat.valueColor || '#1e1b4b' }}>
+                                    {stat.value}
+                                </div>
+                            </div>
+                            <div style={styles.statIcon(stat.iconBg)}>{stat.icon}</div>
+                        </div>
+                        <div style={styles.statFooter}>
+                            {stat.change && (
+                                <span style={styles.statChange(stat.positive || false)}>
+                                    ↑ {stat.change}
+                                </span>
+                            )}
+                            <span style={{ color: '#64748b' }}>{stat.period}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Main Dashboard Grid */}
+            <div style={styles.dashboardGrid}>
+                {/* Portfolio Performance */}
+                <div style={styles.card}>
+                    <div style={styles.cardHeader}>
+                        <h3 style={styles.cardTitle}>Portfolio Performance</h3>
+                        <div style={styles.cardActions}>
+                            <button style={styles.btnSm(true)}>1W</button>
+                            <button style={styles.btnSm(false)}>1M</button>
+                            <button style={styles.btnSm(false)}>3M</button>
+                            <button style={styles.btnSm(false)}>1Y</button>
+                        </div>
+                    </div>
+                    <div style={styles.chartContainer}>
+                        <div style={styles.chartPlaceholder}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+                            <div>Chart visualization will appear here</div>
+                            <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.5rem' }}>
+                                Showing your trading performance over time
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div style={styles.card}>
+                    <div style={styles.cardHeader}>
+                        <h3 style={styles.cardTitle}>Quick Actions</h3>
+                    </div>
+                    <div style={styles.quickActions}>
+                        {quickActions.map((action, index) => (
+                            <Link href={action.href} key={index} style={styles.actionBtn}>
+                                <div style={styles.actionIcon}>{action.icon}</div>
+                                <div style={styles.actionText}>{action.text}</div>
+                            </Link>
+                        ))}
+                    </div>
+
+                    <h4 style={styles.sectionTitle}>Recent Achievements</h4>
+                    <div style={styles.achievementList}>
+                        {recentAchievements.map((achievement, index) => (
+                            <div style={styles.achievementItem} key={index}>
+                                <div style={styles.achievementIcon}>{achievement.icon}</div>
+                                <div style={styles.achievementInfo}>
+                                    <div style={styles.achievementTitle}>{achievement.title}</div>
+                                    <div style={styles.achievementDesc}>{achievement.description}</div>
+                                </div>
+                                <div style={styles.achievementXp}>{achievement.xp}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Section - Recent Trades */}
+            <div style={styles.dashboardGrid}>
+                <div style={styles.card}>
+                    <div style={styles.cardHeader}>
+                        <h3 style={styles.cardTitle}>Recent Trades</h3>
+                        <Link href="/dashboard/history" style={styles.viewAllLink}>
+                            View All →
+                        </Link>
+                    </div>
+                    <div style={styles.tradeList}>
+                        {recentTrades.map((trade, index) => (
+                            <div style={styles.tradeItem} key={index}>
+                                <div style={styles.tradeIcon(trade.type)}>{trade.type.toUpperCase()}</div>
+                                <div style={styles.tradeInfo}>
+                                    <div style={styles.tradeSymbol}>{trade.symbol}</div>
+                                    <div style={styles.tradeTime}>{trade.time}</div>
+                                </div>
+                                <div style={styles.tradeAmount}>
+                                    <div style={styles.tradePnl(trade.positive)}>{trade.pnl}</div>
+                                    <div style={styles.tradeSize}>{trade.size}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Continue Learning */}
+                <div style={styles.card}>
+                    <div style={styles.cardHeader}>
+                        <h3 style={styles.cardTitle}>Continue Learning</h3>
+                        <Link href="/dashboard/courses" style={styles.viewAllLink}>
+                            View All →
+                        </Link>
+                    </div>
+                    <div style={styles.achievementList}>
+                        <div style={styles.achievementItem}>
+                            <div style={styles.achievementIcon}>📚</div>
+                            <div style={styles.achievementInfo}>
+                                <div style={styles.achievementTitle}>Technical Analysis Basics</div>
+                                <div style={styles.achievementDesc}>65% complete • 3 lessons left</div>
+                            </div>
+                        </div>
+                        <div style={styles.achievementItem}>
+                            <div style={styles.achievementIcon}>📈</div>
+                            <div style={styles.achievementInfo}>
+                                <div style={styles.achievementTitle}>Risk Management 101</div>
+                                <div style={styles.achievementDesc}>40% complete • 6 lessons left</div>
+                            </div>
+                        </div>
+                        <div style={styles.achievementItem}>
+                            <div style={styles.achievementIcon}>🎯</div>
+                            <div style={styles.achievementInfo}>
+                                <div style={styles.achievementTitle}>Trading Psychology</div>
+                                <div style={styles.achievementDesc}>20% complete • 8 lessons left</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     );
-  }
-
-  return (
-    <div className="dashboard-layout">
-      {/* Content */}
-      <div className="content">
-        {/* Page Header */}
-        <div className="page-header">
-          <h1>Welcome back, {user?.user_metadata?.full_name || 'Trader'}! 👋</h1>
-          <p>Here's what's happening with your trading journey today.</p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-info">
-                <h3>Virtual Balance</h3>
-                <div className="stat-value">$102,456</div>
-              </div>
-              <div className="stat-icon purple">💰</div>
-            </div>
-            <div className="stat-footer">
-              <span className="stat-change positive">↑ +2.45%</span>
-              <span style={{ color: 'var(--gray)' }}>vs last month</span>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-info">
-                <h3>Total P&L</h3>
-                <div className="stat-value" style={{ color: 'var(--success)' }}>+$2,456</div>
-              </div>
-              <div className="stat-icon green">📈</div>
-            </div>
-            <div className="stat-footer">
-              <span className="stat-change positive">↑ +12.3%</span>
-              <span style={{ color: 'var(--gray)' }}>this week</span>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-info">
-                <h3>Win Rate</h3>
-                <div className="stat-value">67.5%</div>
-              </div>
-              <div className="stat-icon cyan">🎯</div>
-            </div>
-            <div className="stat-footer">
-              <span className="stat-change positive">↑ +5.2%</span>
-              <span style={{ color: 'var(--gray)' }}>improving</span>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-info">
-                <h3>Courses Completed</h3>
-                <div className="stat-value">23/50</div>
-              </div>
-              <div className="stat-icon orange">🎓</div>
-            </div>
-            <div className="stat-footer">
-              <span style={{ color: 'var(--gray)' }}>3 in progress</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Dashboard Grid */}
-        <div className="dashboard-grid">
-          {/* Portfolio Performance */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Portfolio Performance</h3>
-              <div className="card-actions">
-                <button className="btn-sm active">1W</button>
-                <button className="btn-sm">1M</button>
-                <button className="btn-sm">3M</button>
-                <button className="btn-sm">1Y</button>
-              </div>
-            </div>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
-                <div>Chart visualization will appear here</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--gray)', marginTop: '0.5rem' }}>
-                  Showing your trading performance over time
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Quick Actions</h3>
-            </div>
-            <div className="quick-actions">
-              <button className="action-btn">
-                <div className="action-btn-icon">📈</div>
-                <div className="action-btn-text">Start Trading</div>
-              </button>
-              <button className="action-btn">
-                <div className="action-btn-icon">🎓</div>
-                <div className="action-btn-text">Learn More</div>
-              </button>
-              <button className="action-btn">
-                <div className="action-btn-icon">🏆</div>
-                <div className="action-btn-text">Competitions</div>
-              </button>
-              <button className="action-btn">
-                <div className="action-btn-icon">📊</div>
-                <div className="action-btn-text">Analytics</div>
-              </button>
-            </div>
-
-            <div style={{ marginTop: '2rem' }}>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--secondary)' }}>
-                Recent Achievements
-              </h4>
-              <div className="achievement-list">
-                <div className="achievement-item">
-                  <div className="achievement-icon">🏆</div>
-                  <div className="achievement-info">
-                    <div className="achievement-title">First Win!</div>
-                    <div className="achievement-desc">Completed your first profitable trade</div>
-                  </div>
-                  <div className="achievement-xp">+50 XP</div>
-                </div>
-                <div className="achievement-item">
-                  <div className="achievement-icon">🎯</div>
-                  <div className="achievement-info">
-                    <div className="achievement-title">10 Trades</div>
-                    <div className="achievement-desc">Executed 10 simulation trades</div>
-                  </div>
-                  <div className="achievement-xp">+100 XP</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="dashboard-grid">
-          {/* Recent Trades */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Recent Trades</h3>
-              <a href="#" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>
-                View All →
-              </a>
-            </div>
-            <div className="trade-list">
-              <div className="trade-item">
-                <div className="trade-icon buy">BUY</div>
-                <div className="trade-info">
-                  <div className="trade-symbol">EUR/USD</div>
-                  <div className="trade-time">2 hours ago</div>
-                </div>
-                <div className="trade-amount">
-                  <div className="trade-pnl positive">+$245.50</div>
-                  <div className="trade-size">0.5 lots</div>
-                </div>
-              </div>
-
-              <div className="trade-item">
-                <div className="trade-icon sell">SELL</div>
-                <div className="trade-info">
-                  <div className="trade-symbol">GBP/USD</div>
-                  <div className="trade-time">5 hours ago</div>
-                </div>
-                <div className="trade-amount">
-                  <div className="trade-pnl negative">-$87.20</div>
-                  <div className="trade-size">0.3 lots</div>
-                </div>
-              </div>
-
-              <div className="trade-item">
-                <div className="trade-icon buy">BUY</div>
-                <div className="trade-info">
-                  <div className="trade-symbol">USD/JPY</div>
-                  <div className="trade-time">1 day ago</div>
-                </div>
-                <div className="trade-amount">
-                  <div className="trade-pnl positive">+$156.80</div>
-                  <div className="trade-size">0.4 lots</div>
-                </div>
-              </div>
-
-              <div className="trade-item">
-                <div className="trade-icon buy">BUY</div>
-                <div className="trade-info">
-                  <div className="trade-symbol">BTC/USD</div>
-                  <div className="trade-time">2 days ago</div>
-                </div>
-                <div className="trade-amount">
-                  <div className="trade-pnl positive">+$412.30</div>
-                  <div className="trade-size">0.02 BTC</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Learning Progress */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Continue Learning</h3>
-              <a href="#" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>
-                Browse All →
-              </a>
-            </div>
-
-            <div className="course-grid">
-              <div className="course-card">
-                <div className="course-thumbnail">📈</div>
-                <div className="course-title">Technical Analysis Basics</div>
-                <div className="course-progress">65% complete</div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: '65%' }}></div>
-                </div>
-              </div>
-
-              <div className="course-card">
-                <div className="course-thumbnail">💡</div>
-                <div className="course-title">Risk Management 101</div>
-                <div className="course-progress">30% complete</div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: '30%' }}></div>
-                </div>
-              </div>
-
-              <div className="course-card">
-                <div className="course-thumbnail">🎯</div>
-                <div className="course-title">Price Action Trading</div>
-                <div className="course-progress">Not started</div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: '0%' }}></div>
-                </div>
-              </div>
-
-              <div className="course-card">
-                <div className="course-thumbnail">📊</div>
-                <div className="course-title">Market Psychology</div>
-                <div className="course-progress">90% complete</div>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: '90%' }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Info Cards */}
-        <div className="dashboard-grid">
-          {/* Market Updates */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Market Updates</h3>
-              <button className="btn-sm">Refresh</button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ padding: '1rem', background: 'var(--gray-light)', borderRadius: '12px', borderLeft: '3px solid var(--success)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <strong style={{ color: 'var(--secondary)' }}>EUR/USD</strong>
-                  <span style={{ color: 'var(--success)', fontWeight: 700 }}>↑ 1.0856</span>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>+0.32% today</div>
-              </div>
-
-              <div style={{ padding: '1rem', background: 'var(--gray-light)', borderRadius: '12px', borderLeft: '3px solid var(--error)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <strong style={{ color: 'var(--secondary)' }}>GBP/USD</strong>
-                  <span style={{ color: 'var(--error)', fontWeight: 700 }}>↓ 1.2634</span>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>-0.18% today</div>
-              </div>
-
-              <div style={{ padding: '1rem', background: 'var(--gray-light)', borderRadius: '12px', borderLeft: '3px solid var(--success)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <strong style={{ color: 'var(--secondary)' }}>BTC/USD</strong>
-                  <span style={{ color: 'var(--success)', fontWeight: 700 }}>↑ 43,256</span>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>+2.45% today</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Upcoming Events */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">Upcoming Events</h3>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ padding: '1rem', background: 'var(--gray-light)', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <div style={{ textAlign: 'center', minWidth: '50px' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>15</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--gray)' }}>DEC</div>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: 'var(--secondary)', marginBottom: '0.25rem' }}>Live Trading Webinar</div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>Join expert traders for live market analysis</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--primary)', marginTop: '0.5rem' }}>🕐 2:00 PM EST</div>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ padding: '1rem', background: 'var(--gray-light)', borderRadius: '12px' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <div style={{ textAlign: 'center', minWidth: '50px' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>20</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--gray)' }}>DEC</div>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: 'var(--secondary)', marginBottom: '0.25rem' }}>Trading Competition Finals</div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--gray)' }}>Compete for prizes and recognition</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--warning)', marginTop: '0.5rem' }}>🏆 $5,000 Prize Pool</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Risk Warning */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(6, 182, 212, 0.05))',
-          borderRadius: '16px',
-          padding: '2rem',
-          marginTop: '2rem',
-          border: '2px solid rgba(124, 58, 237, 0.2)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-            <div style={{ fontSize: '2rem' }}>⚠️</div>
-            <div style={{ flex: 1 }}>
-              <h3 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--secondary)', marginBottom: '0.5rem' }}>
-                Practice Mode Active
-              </h3>
-              <p style={{ color: 'var(--gray)', lineHeight: 1.6 }}>
-                You're currently trading with <strong>virtual money</strong> for educational purposes. All trades are simulations and do not involve real financial transactions. Use this platform to learn and practice before considering real trading.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
