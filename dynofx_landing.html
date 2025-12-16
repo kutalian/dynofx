@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DynoFX - Transform Your Trading Journey</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #a78bfa;
+      --accent: #06b6d4;
+      --accent-dark: #0891b2;
+      --secondary: #1e1b4b;
+      --dark: #0f172a;
+      --light: #ffffff;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --gradient: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      --gradient-alt: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+      --shadow: 0 10px 40px rgba(124, 58, 237, 0.15);
+      --shadow-lg: 0 20px 60px rgba(124, 58, 237, 0.25);
+      --glow: 0 0 40px rgba(124, 58, 237, 0.3);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+      line-height: 1.6;
+      color: var(--secondary);
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    nav.scrolled {
+      padding: 0.8rem 2rem;
+      box-shadow: 0 2px 30px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--secondary);
+      font-weight: 500;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f1117 0%, #1a1d29 100%);
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: pulse 5s ease-in-out infinite reverse;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .hero-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-content h1 {
+      font-size: 4rem;
+      color: white;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -2px;
+    }
+
+    .hero-content .highlight {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-content p {
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 3rem;
+    }
+
+    .stat-item {
+      text-align: left;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: block;
+    }
+
+    .stat-label {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.95rem;
+    }
+
+    .hero-image {
+      position: relative;
+    }
+
+    .trading-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow-lg);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .chart-mockup {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      background: var(--gradient);
+      clip-path: polygon(0 70%, 20% 50%, 40% 60%, 60% 30%, 80% 40%, 100% 20%, 100% 100%, 0 100%);
+      opacity: 0.7;
+      filter: drop-shadow(0 -5px 20px rgba(124, 58, 237, 0.5));
+    }
+
+    /* Features Section */
+    .features {
+      padding: 6rem 2rem;
+      background: white;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -1px;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--gray);
+      font-size: 1.2rem;
+      margin-bottom: 4rem;
+    }
+
+    .features-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      padding: 2.5rem;
+      border-radius: 20px;
+      background: white;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+      border: 1px solid #f0f0f0;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feature-icon {
+      width: 70px;
+      height: 70px;
+      background: var(--gradient);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: white;
+      box-shadow: var(--glow);
+      animation: iconFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--secondary);
+    }
+
+    .feature-card p {
+      color: var(--gray);
+      line-height: 1.8;
+    }
+
+    /* Trading Platforms */
+    .platforms {
+      padding: 6rem 2rem;
+      background: #f8f9fa;
+    }
+
+    .platforms-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 3rem;
+    }
+
+    .platform-card {
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+    }
+
+    .platform-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .platform-image {
+      height: 250px;
+      background: var(--gradient-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .platform-image::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      animation: rotate 10s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .platform-content {
+      padding: 2rem;
+    }
+
+    .platform-content h3 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .platform-content ul {
+      list-style: none;
+      margin: 1.5rem 0;
+    }
+
+    .platform-content li {
+      padding: 0.5rem 0;
+      color: var(--gray);
+    }
+
+    .platform-content li::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 6rem 2rem;
+      background: var(--secondary);
+      color: white;
+    }
+
+    .testimonials-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .testimonial-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .testimonial-rating {
+      color: #ffc107;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .author-info h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .author-info p {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+    }
+
+    /* CTA Section */
+    .cta {
+      padding: 6rem 2rem;
+      background: var(--gradient);
+      color: white;
+      text-align: center;
+    }
+
+    .cta-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .cta h2 {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+    }
+
+    .cta p {
+      font-size: 1.3rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.95;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--primary);
+    }
+
+    .btn-white:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 4rem 2rem 2rem;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-section a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section a:hover {
+      color: var(--primary);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero-stats {
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .cta h2 {
+        font-size: 2rem;
+      }
+
+      .cta-buttons {
+        flex-direction: column;
+      }
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <div class="logo">DynoFX</div>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#platforms">Platforms</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#" class="btn btn-outline">Login</a></li>
+        <li><a href="#" class="btn btn-primary">Start Trading</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero fade-in">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div style="display: inline-block; background: rgba(124, 58, 237, 0.1); color: var(--primary); padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 600; margin-bottom: 1rem; border: 2px solid var(--primary);">
+          🎓 Risk-Free Trading Simulator + Academy
+        </div>
+        <h1>Master Trading Without <span class="highlight">Risking Real Money</span></h1>
+        <p>Learn, practice, and perfect your trading skills in a realistic simulation environment. Get expert training, compete with others, and track your progress—all without financial risk.</p>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="#" class="btn btn-primary">Start Free Training</a>
+          <a href="#" class="btn btn-outline" style="color: white; border-color: white;">Explore Courses</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">$100K</span>
+            <span class="stat-label">Virtual Starting Balance</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Training Lessons</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">50K+</span>
+            <span class="stat-label">Learning Traders</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="trading-card">
+          <div class="chart-mockup">
+            <div class="chart-line"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 1.5rem; color: white;">
+            <div>
+              <div style="font-size: 0.8rem; opacity: 0.7;">Practice Trade - EUR/USD</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);">1.0856 ↑</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.8rem; opacity: 0.7;">Virtual Portfolio</div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);">$101,234.50</div>
+            </div>
+          </div>
+          <div style="margin-top: 1rem; padding: 1rem; background: rgba(124, 58, 237, 0.2); border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px;">⚠️ Simulation Mode - No Real Money</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <h2 class="section-title">Learn Trading the Safe Way</h2>
+    <p class="section-subtitle">Practice with virtual money while building real skills through our comprehensive training program</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <h3>Realistic Simulation</h3>
+        <p>Trade with $100K virtual money in a real-market environment. Experience authentic trading without any financial risk.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>DynoFX University</h3>
+        <p>Access 500+ video lessons, interactive courses, and live webinars. Learn from beginner basics to advanced strategies.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Progress Tracking</h3>
+        <p>Monitor your learning journey with detailed analytics. See your improvement, earn achievements, and level up your skills.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Trading Competitions</h3>
+        <p>Compete with other learners in risk-free tournaments. Test your skills, climb leaderboards, and win rewards.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👨‍🏫</div>
+        <h3>Expert Mentorship</h3>
+        <p>Get guidance from professional traders. Join study groups, ask questions, and learn from the community.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Strategy Testing</h3>
+        <p>Develop and test your trading strategies with zero risk. Perfect your approach before considering real trading.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platforms Section -->
+  <section class="platforms" id="platforms">
+    <h2 class="section-title">Practice Anywhere, Anytime</h2>
+    <p class="section-subtitle">Access your virtual trading account and learning materials on any device</p>
+    <div class="platforms-grid">
+      <div class="platform-card">
+        <div class="platform-image">💻</div>
+        <div class="platform-content">
+          <h3>Web Simulator</h3>
+          <p>Practice trading directly from your browser with our realistic simulation platform. No downloads required.</p>
+          <ul>
+            <li>Real-time market data simulation</li>
+            <li>$100K virtual starting balance</li>
+            <li>All trading tools included</li>
+            <li>Save & track your progress</li>
+          </ul>
+          <a href="#" class="btn btn-primary" style="display: inline-block; margin-top: 1rem;">Launch Simulator</a>
+        </div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-image">📱</div>
+        <div class="platform-content">
+          <h3>Mobile Learning App</h3>
+          <p>Learn on the go with our mobile app. Practice trading and access courses from anywhere.</p>
+          <ul>
+            <li>Video lessons & tutorials</li>
+            <li>Practice trading mode</li>
+            <li>Progress tracking</li>
+            <li>Offline course downloads</li>
+          </ul>
+          <a href="#" class="btn btn-primary" style="display: inline-block; margin-top: 1rem;">Get Mobile App</a>
+        </div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-image">🎓</div>
+        <div class="platform-content">
+          <h3>DynoFX University</h3>
+          <p>Complete trading education platform with structured courses from beginner to advanced level.</p>
+          <ul>
+            <li>500+ video lessons</li>
+            <li>Interactive quizzes</li>
+            <li>Certificates of completion</li>
+            <li>Live webinars & mentorship</li>
+          </ul>
+          <a href="#" class="btn btn-primary" style="display: inline-block; margin-top: 1rem;">Browse Courses</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <h2 class="section-title" style="color: white;">Success Stories from Our Students</h2>
+    <p class="section-subtitle" style="color: rgba(255,255,255,0.7);">See how DynoFX helped aspiring traders master their skills</p>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-rating">★★★★★</div>
+        <p class="testimonial-text">"I went from complete beginner to confident trader in just 3 months. The simulation environment let me practice without fear, and the courses are absolutely top-notch!"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">JD</div>
+          <div class="author-info">
+            <h4>John Davidson</h4>
+            <p>Business Student</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-rating">★★★★★</div>
+        <p class="testimonial-text">"The structured learning path and gamification kept me motivated. I've completed 50+ courses and my virtual portfolio has grown 45%. Ready to take it to the next level!"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SC</div>
+          <div class="author-info">
+            <h4>Sarah Chen</h4>
+            <p>Software Engineer</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-rating">★★★★★</div>
+        <p class="testimonial-text">"Best trading education platform I've tried. The simulation feels real, the lessons are clear, and I love competing in tournaments with other learners. Highly recommend!"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">MR</div>
+          <div class="author-info">
+            <h4>Michael Rodriguez</h4>
+            <p>Finance Enthusiast</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="cta-container">
+      <h2>Ready to Start Your Trading Education?</h2>
+      <p>Join DynoFX today and get $100,000 virtual money to practice with. Learn risk-free, compete with others, and master trading skills at your own pace.</p>
+      <div style="background: rgba(255,255,255,0.15); padding: 1rem 2rem; border-radius: 10px; margin: 1.5rem auto; max-width: 600px; backdrop-filter: blur(10px);">
+        <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">✓ 100% Risk-Free Learning Environment</div>
+        <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">✓ No Credit Card Required</div>
+        <div style="font-size: 0.9rem; font-weight: 600;">✓ Start with $100K Virtual Money</div>
+      </div>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-white" style="font-size: 1.1rem; padding: 1rem 3rem;">Create Free Account</a>
+        <a href="#" class="btn btn-outline" style="border-color: white; color: white; font-size: 1.1rem; padding: 1rem 3rem;">Explore Courses</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-section">
+        <h3>DynoFX</h3>
+        <p style="color: rgba(255,255,255,0.7); line-height: 1.8;">A safe, risk-free trading simulation and education platform. Learn to trade with virtual money while building real skills.</p>
+        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(124, 58, 237, 0.2); border-radius: 8px; border-left: 3px solid var(--primary);">
+          <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); margin: 0;">
+            <strong>⚠️ Educational Platform Notice:</strong> DynoFX is a trading simulation and education platform. All trading is done with virtual money for learning purposes only.
+          </p>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Learn</h3>
+        <ul>
+          <li><a href="#">Trading Courses</a></li>
+          <li><a href="#">Video Tutorials</a></li>
+          <li><a href="#">Trading Strategies</a></li>
+          <li><a href="#">Market Analysis</a></li>
+          <li><a href="#">Webinars</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Practice</h3>
+        <ul>
+          <li><a href="#">Trading Simulator</a></li>
+          <li><a href="#">Competitions</a></li>
+          <li><a href="#">Leaderboards</a></li>
+          <li><a href="#">Achievements</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Company</h3>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Legal</a></li>
+          <li><a href="#">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 DynoFX - Trading Simulation & Education Platform. All rights reserved.</p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">Educational Notice: DynoFX provides trading simulation and educational services only. All trades are executed with virtual money. This platform does not involve real money trading or financial services.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

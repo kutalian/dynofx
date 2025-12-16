@@ -1,164 +1,200 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
-import { supabase } from '@/lib/supabaseClient'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Loader2, AlertCircle, Chrome, ArrowLeft } from 'lucide-react'
+import { useState } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/utils/supabase/client';
 
 export default function LoginPage() {
-    const router = useRouter()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [formAlert, setFormAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-        setError(null)
-
-        try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            })
-
-            if (error) throw error
-
-            router.push('/')
-            router.refresh()
-        } catch (err: any) {
-            setError(err.message)
-        } finally {
-            setLoading(false)
-        }
-    }
+    const supabase = createClient();
 
     const handleGoogleLogin = async () => {
         try {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${location.origin}/auth/callback`,
+                    redirectTo: `${window.location.origin}/auth/callback`,
                 },
-            })
-            if (error) throw error
-        } catch (err: any) {
-            setError(err.message)
+            });
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error logging in with Google:', error);
+            setFormAlert({ message: 'Error logging in with Google', type: 'error' });
         }
-    }
+    };
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setFormAlert(null);
+
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                setFormAlert({ message: `✗ ${error.message}`, type: 'error' });
+            } else {
+                setFormAlert({ message: '✓ Login successful! Redirecting...', type: 'success' });
+                // We typically wait for the router/state update, but for UX we can redirect manually or wait for the auth state listener
+                // A hard redirect ensures the full app state is refreshed
+                window.location.href = '/dashboard';
+            }
+        } catch (error) {
+            setFormAlert({ message: '✗ An unexpected error occurred', type: 'error' });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-[#0B0E11] flex flex-col items-center justify-center p-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Back Button */}
-            <Link href="/" className="absolute top-6 left-6 text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                <ArrowLeft className="w-4 h-4" /> Back
-            </Link>
+        <div className="auth-page-body">
+            <div className="back-home">
+                <Link href="/">← Back to Home</Link>
+            </div>
 
-            <div className="w-full max-w-md space-y-8">
-                <div className="text-center">
-                    <div className="w-16 h-16 relative mx-auto mb-6 rounded-xl overflow-hidden shadow-2xl shadow-indigo-500/20">
-                        <Image
-                            src="/logo.jpg"
-                            alt="DynoFX Logo"
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-white">Welcome back</h2>
-                    <p className="mt-2 text-sm text-gray-400">
-                        Enter your credentials to access your terminal
-                    </p>
-                </div>
-
-                <div className="glass-panel p-8 rounded-2xl sm:px-10">
-                    <div className="space-y-6">
-                        <Button
-                            size="lg"
-                            variant="outline"
-                            className="w-full gap-3 bg-white text-black hover:bg-gray-100 border-none font-semibold h-12"
-                            onClick={handleGoogleLogin}
-                        >
-                            <Chrome className="w-5 h-5 text-blue-600" />
-                            Sign in with Google
-                        </Button>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-white/10" />
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="bg-[#131619] px-4 text-gray-500 rounded-full">or email</span>
+            <div className="auth-container">
+                <div className="auth-wrapper">
+                    {/* Left Side - Branding */}
+                    <div className="auth-branding">
+                        <div>
+                            <div className="logo">DynoFX</div>
+                            <div className="branding-content">
+                                <h2>Start Your Trading Journey Today</h2>
+                                <p>Practice trading risk-free with $100,000 virtual money and learn from expert traders.</p>
+                                <ul className="feature-list">
+                                    <li>Risk-free simulation environment</li>
+                                    <li>500+ educational video lessons</li>
+                                    <li>Real-time market data</li>
+                                    <li>Compete with other traders</li>
+                                    <li>Track your progress & achievements</li>
+                                </ul>
                             </div>
                         </div>
+                        <div style={{ opacity: 0.8, fontSize: '0.85rem' }}>
+                            🎓 100% Educational Platform - No Real Money Trading
+                        </div>
+                    </div>
 
-                        <form onSubmit={handleLogin} className="space-y-6">
-                            {error && (
-                                <div className="bg-red-500/10 border border-red-500/20 text-red-200 text-sm p-4 rounded-lg flex items-start gap-3">
-                                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                                    <span>{error}</span>
+                    {/* Right Side - Forms */}
+                    <div className="auth-forms">
+                        <div className="form-container active" style={{ display: 'block' }}>
+                            <div className="form-header">
+                                <h2>Welcome Back!</h2>
+                                <p>Sign in to continue your trading journey</p>
+                            </div>
+
+                            {formAlert && (
+                                <div
+                                    className="alert show"
+                                    style={{
+                                        display: 'flex',
+                                        padding: '0.875rem 1rem',
+                                        borderRadius: '12px',
+                                        marginBottom: '1.5rem',
+                                        alignItems: 'center',
+                                        gap: '0.75rem',
+                                        fontSize: '0.9rem',
+                                        backgroundColor: formAlert.type === 'success' ? '#d1fae5' : '#fee2e2',
+                                        color: formAlert.type === 'success' ? '#065f46' : '#991b1b',
+                                        border: `1px solid ${formAlert.type === 'success' ? '#6ee7b7' : '#fca5a5'}`,
+                                    }}
+                                >
+                                    {formAlert.message}
                                 </div>
                             )}
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1.5 ml-1">Email address</label>
-                                    <Input
+                            <form onSubmit={handleLogin}>
+                                <div className="form-group">
+                                    <label htmlFor="loginEmail">Email Address</label>
+                                    <input
                                         type="email"
-                                        placeholder="name@company.com"
+                                        id="loginEmail"
+                                        className="auth-input"
+                                        placeholder="your@email.com"
+                                        required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        className="h-12"
                                     />
                                 </div>
 
-                                <div>
-                                    <div className="flex items-center justify-between mb-1.5 ml-1">
-                                        <label className="block text-sm font-medium text-gray-300">Password</label>
-                                        <a href="#" className="text-xs font-semibold text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+                                <div className="form-group">
+                                    <label htmlFor="loginPassword">Password</label>
+                                    <div className="input-wrapper">
+                                        <input
+                                            type={showPassword ? 'text' : 'password'}
+                                            id="loginPassword"
+                                            className="auth-input"
+                                            placeholder="Enter your password"
+                                            required
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                        <span
+                                            className="password-toggle"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? '🙈' : '👁️'}
+                                        </span>
                                     </div>
-                                    <Input
-                                        type="password"
-                                        placeholder="Enter your password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        className="h-12"
-                                    />
                                 </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="rememberMe" />
+                                    <label htmlFor="rememberMe">Remember me</label>
+                                </div>
+
+                                <div className="forgot-password-link">
+                                    <Link href="/forgot-password">Forgot Password?</Link>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className={`btn btn-primary ${loading ? 'loading' : ''}`}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            Signing In<span className="spinner"></span>
+                                        </>
+                                    ) : (
+                                        'Sign In'
+                                    )}
+                                </button>
+                            </form>
+
+                            <div className="divider">Or continue with</div>
+
+                            <div className="social-buttons" style={{ gridTemplateColumns: '1fr' }}>
+                                <button
+                                    className="btn-social"
+                                    type="button"
+                                    onClick={handleGoogleLogin}
+                                >
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                                    </svg>
+                                    Sign in with Google
+                                </button>
                             </div>
 
-                            <Button
-                                type="submit"
-                                className="w-full text-base"
-                                size="lg"
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                        Authenticating...
-                                    </>
-                                ) : (
-                                    'Sign In'
-                                )}
-                            </Button>
-                        </form>
+                            <div className="switch-form">
+                                Don't have an account? <Link href="/signup">Sign Up</Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <p className="text-center text-sm text-gray-400">
-                    Don't have an account?{' '}
-                    <Link href="/signup" className="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
-                        Create an account
-                    </Link>
-                </p>
             </div>
         </div>
-    )
+    );
 }

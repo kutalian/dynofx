@@ -16,7 +16,7 @@ DynoFX is a comprehensive forex trading education and simulation platform. It co
 - **Authentication**: Secure Login/Signup with robust password validation and Google OAuth support.
 - **Modern UI/UX**: Premium "Dark Mode" aesthetic with glassmorphism and responsive design.
 - **Mobile First**: Fully optimized for trading on the go.
-- **Landing Page**: High-converting entry point with feature showcases.
+- **Landing Page**: Implemented with high-converting entry point and feature showcases.
 - **Trading Simulator**: (In Progress) Real-time execution simulation.
 - **Gamification**: (In Progress) XP, Levels, and Achievements.
 
@@ -61,4 +61,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## 📜 License
 
-© 2024-2025 DynoFX. All rights reserved.
+© 2025 DynoFX. All rights reserved.
