@@ -4,6 +4,10 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'DynoFX | Professional Trading Simulator',
   description: 'Master the financial markets with our advanced trading simulator and educational platform.',
+  icons: {
+    icon: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
 }
 
 export default function RootLayout({
